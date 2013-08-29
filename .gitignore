@@ -1,0 +1,8 @@
+*.capt
+*.ps
+*.eps
+*.pbm
+*.pgm
+*.pnm
+captdefilter
+*.o
