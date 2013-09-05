@@ -1,14 +1,12 @@
 #include "hiscoa-decompress.h"
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
+#include "std.h"
+#include "hiscoa-common.h"
 
 struct state {
+	const uint8_t xorval;
 	const uint8_t *const input_buf;
 	const size_t input_size;
-	const uint8_t xorval;
 	unsigned bitpos;
 
 	uint8_t *const output_buf;
@@ -128,9 +126,9 @@ unsigned hiscoa_decompress_band(
 )
 {
 	struct state state = {
+		.xorval = 0x43,
 		.input_buf = *(uint8_t **) band,
 		.input_size = size ? *size : (size_t) -1,
-		.xorval = 0x43,
 		.bitpos = 0,
 		.output_buf = output,
 		.output_size = output_size ? *output_size : (size_t) -1,
@@ -148,7 +146,7 @@ unsigned hiscoa_decompress_band(
 
 	unsigned ret;
 	bool end = false;
-	while (! end) {
+	while (! end && state.bitpos < 8 * state.input_size) {
 		bool no_reset_prefix = false;
 		unsigned group = read_n10(&state, 8);
 		switch (group) {
@@ -198,6 +196,8 @@ unsigned hiscoa_decompress_band(
 	while (state.bitpos % 32)
 		read_bit(&state);
 
+	if (state.bitpos > 8 * state.input_size)
+		state.bitpos = 8 * state.input_size;
 	*(uint8_t **) band += state.bitpos / 8;
 	if (size)
 		*size -= state.bitpos / 8;

@@ -1,16 +1,7 @@
 #pragma once
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-
-struct hiscoa_params {
-	int origin_3;
-	int origin_5;
-	int origin_0;
-	int origin_2;
-	int origin_4;
-};
+#include "std.h"
+#include "hiscoa-common.h"
 
 unsigned hiscoa_decompress_band(
 	const void **band, size_t *size,

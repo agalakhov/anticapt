@@ -1,5 +1,5 @@
 
-SRCS = captdefilter.c hiscoa-decompress.c
+SRCS = test-hiscoa.c hiscoa-decompress.c hiscoa-compress.c
 
-captdefilter: $(SRCS)
+test-hiscoa: $(SRCS)
 	gcc-color -O2 -o $@ $^

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include "std.h"
 
 static inline uint8_t HI(uint16_t x)
 {
