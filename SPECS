@@ -71,8 +71,8 @@ Page parameters. Mandatory. Issued before each page.
   20-25: ? 00 00 78 00 60 00
   26-27: uint16_t image width (line size in bytes) = LINESIZE for compressor
   28-29: uint16_t image height (number of lines)
-  30-31: ? 60 13 - related to page dimensions, this is A4, Letter is ec 13
-  32-33: ? 66 1b - related to page dimensions, this is A4, Letter is 19 c8
+  30-31: uint16_t paper width (pixels = inches * 600)
+  32-33: uint16_t paper height (pixels = inches * 600)
   -- Older printers have only 34 bytes
   34-35: ? 00 00
   36:    01 paper type B? 01 = plain, 02 = thick
@@ -93,12 +93,14 @@ sending Hi-SCoA compressed data. See section 3 for the complete description of
 these parameters. Contains 8-byte data.
   0:   int8_t value of L3, positive
   1:   int8_t value of L5, positive
-  2:   0x01 unknown, may be flag (enable length swapping?)
-  3:   0x02 unknown, may be flag (enable length swapping?)
+  2:   0x01 unknown, may be flag
+  3:   0x01 unknown, may be bpp (0x08 for color printers?)
   4:   int8_t value of L0 (?), always zero
   5:   int8_t value of L2, negative
   6-7: int16_t value of L4 (?)
 
+* 0xD0A5, 0xD0A6, 0xD0A7
+Hi-SCoA parameters for color printers?
 
 * 0xD0A9 - multi-command
 Contains other 0xD0nn commands, like that: A9 D0 C0 00 A1 D0 04 00 A2 D0 04 00
