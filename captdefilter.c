@@ -117,6 +117,7 @@ static void dispatch(uint16_t cmd, const uint8_t *buf, size_t size)
 		dump(buf, 16);
 		break;
 	case 0x8000:
+	case 0x8200:
 		fprintf(stderr, "  -(Hi-SCoA data)-\n");
 		dump(buf, 4);
 		decode_hiscoa_band(buf, size);
@@ -153,7 +154,8 @@ int main(int argc, char **argv)
 	while (1) {
 		int s;
 		uint16_t cmd;
-		uint16_t len;
+		uint32_t len;
+		size_t pos;
 		s = fread(buf, 1, 4, input);
 		if (s == 0)
 			break;
@@ -161,14 +163,26 @@ int main(int argc, char **argv)
 			fprintf(stderr, "! unable to read header\n");
 			break;
 		}
+		pos = 4;
 		cmd = WORD(buf[0], buf[1]);
-		len = WORD(buf[2], buf[3]);
-		fprintf(stderr, "CMD %04X len=%u\n", cmd, len);
-		if (fread(buf + 4, 1, len - 4, input) != len - 4) {
-			fprintf(stderr, "! unable to read %u bytes\n");
+		switch (cmd) {
+		case 0x8200:
+			fread(buf + pos, 1, 4, input);
+			pos += 4;
+			len = WORD(buf[6], buf[7]);
+			len <<= 16;
+			len += WORD(buf[4], buf[5]);
+			break;
+		default:
+			len = WORD(buf[2], buf[3]);
 			break;
 		}
-		dispatch(cmd, buf + 4, len - 4);
+		fprintf(stderr, "CMD %04X len=%u\n", cmd, len);
+		if (fread(buf + pos, 1, len - pos, input) != len - pos) {
+			fprintf(stderr, "! unable to read %u bytes\n", len - pos);
+			break;
+		}
+		dispatch(cmd, buf + pos, len - pos);
 	}
 
 	if (argc > 1)
